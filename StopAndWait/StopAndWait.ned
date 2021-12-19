@@ -36,8 +36,8 @@ network StopAndWait
         channel Channel extends ned.DatarateChannel
         {
             datarate = 9600000bps;
-            delay = 100ms; //tprop
-            per = 0.1; //packet error rate
+            delay = 100ms; //tprop, para hacer pruebas de timeout se ha aumentado el valor
+            per = 0.5; //packet error rate
         }
 
     submodules:
