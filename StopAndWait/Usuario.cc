@@ -80,7 +80,7 @@ Paquete* Usuario::getPacket() {
     char *charnombrepaquete = new char[nombrepaquete.length() + 1];
     strcpy(charnombrepaquete, nombrepaquete.c_str());
     Paquete *pqt = new Paquete(charnombrepaquete);
-    pqt -> setKind(1);
+    pqt -> setKind(4);
     pqt -> setNumeroseq(numeroseq);
     pqt -> setNumerrors(numeroseq);
     numeroseq++;

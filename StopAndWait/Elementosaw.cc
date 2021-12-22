@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <omnetpp.h>
@@ -6,7 +5,7 @@
 
 using namespace omnetpp;
 
-class Cola : public cSimpleModule
+class Elementosaw : public cSimpleModule
 {
     private:
 
@@ -22,9 +21,9 @@ class Cola : public cSimpleModule
         virtual void sendPacket(Paquete *pkt);
 };
 
-Define_Module(Cola);
+Define_Module(Elementosaw);
 
-void Cola::initialize() {
+void Elementosaw::initialize() {
 
     queue = new cQueue("cola");
     timeout = 1.0;
@@ -32,7 +31,7 @@ void Cola::initialize() {
 
 }
 
-void Cola::handleMessage(cMessage *msg)
+void Elementosaw::handleMessage(cMessage *msg)
 {
     Paquete *pkt = check_and_cast<Paquete *> (msg);
 
@@ -42,8 +41,29 @@ void Cola::handleMessage(cMessage *msg)
             EV << "Timeout, se reenvia el mensaje\n";
             sendNext();
         }
+
+    if (pkt -> getKind() == 4) { // 1: paquete de la fuente
+            pkt -> setKind(1); //porque ahora ya no es de una fuente, sino de un nodo
+            EV << "Se envia un mensaje recibido de la fuente\n";
+            sendNew(pkt);
+            return;
+        }
     if (pkt -> getKind() == 1) { // 1: paquete de la fuente
-        EV << "Se envia un mensaje recibido de la fuente\n";
+
+        if (pkt -> hasBitError()) {
+                    EV << "Hay error, se devuelve NACK\n";
+                    Paquete *nak = new Paquete("NAK");
+                    nak -> setKind(3);
+                    send(nak, "out",1);
+                }
+                else {
+                    EV << "No hay error, se devuelve un ACK\n";
+                    Paquete *ack = new Paquete("ACK");
+                    ack -> setKind(2);
+                    send(ack, "out",1);
+                    EV << "Packet it's okay!";
+                }
+        EV << "Se envia un mensaje recibido de otro nodo\n";
         sendNew(pkt);
         return;
     }
@@ -66,7 +86,7 @@ void Cola::handleMessage(cMessage *msg)
     }
 }
 
-void Cola::sendNew(Paquete *pkt) {
+void Elementosaw::sendNew(Paquete *pkt) {
 
     if (queue -> isEmpty()) {
         EV << "La cola esta vacia\n";
@@ -79,7 +99,7 @@ void Cola::sendNew(Paquete *pkt) {
     }
 }
 
-void Cola::sendNext() {
+void Elementosaw::sendNext() {
     if (queue -> isEmpty())
         EV << "No hay mas paquetes en la cola\n";
     else {
@@ -89,11 +109,11 @@ void Cola::sendNext() {
     }
 }
 
-void Cola::sendPacket(Paquete *pkt) {
+void Elementosaw::sendPacket(Paquete *pkt) {
 
         // OMNeT++ can't send a packet while it is queued, must send a copy
         Paquete *newPkt = check_and_cast<Paquete *> (pkt -> dup());
-        send(newPkt, "out");
+        send(newPkt, "out",0);
         scheduleAt(simTime()+timeout, timeoutEvent);
 
 }
