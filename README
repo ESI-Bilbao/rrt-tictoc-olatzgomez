@@ -1,6 +1,0 @@
-Este es el fichero README. Aquí habrá un log con los cambios que he realizado en el proyecto de OMNET++. 
-
-19/12/2021 - Partiendo del proyecto StopAndWait de la primera entrega, se ha añadido el evento Timeoutevent.
-             Es un evento que se genera al enviar un paquete, y que la misma cola (Cola.cc) recibirá. 
-             En caso de recibir el Timeoutevent, se reenvía el paquete. 
-             En caso de recibir un ack o nak antes de que pase el tiempo de timeout, se cancela el evento Timeoutevent. 
