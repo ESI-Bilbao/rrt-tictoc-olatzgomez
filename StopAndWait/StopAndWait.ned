@@ -23,8 +23,7 @@ simple Servidor
     parameters:
         @display("i=block/process");
     gates:
-        input in;
-        output out;
+        inout cx[];
 }
 
 simple Elementosaw
@@ -32,50 +31,56 @@ simple Elementosaw
     parameters:
         @display("i=block/routing");
     gates:
-        input in;
-      	inout out;
+        
+      	inout conexion[];
 }
 
 simple Conmutador
 {
     parameters:
         @display("i=block/routing");
+        double probabilidad;
     gates:
+        inout conexion[];
         input in[];
-        output out[];
 }
 
 module Nodo
 {
+    parameters:
+        double prob;
+        int numcx;
     gates:
         input innodo[];
         inout outnodo[];
-
+		
     submodules:
-        protocolo[sizeof(outnodo)]: Elementosaw {
+        protocolo[numcx]: Elementosaw {
             parameters:
             @display("p=106,122");
             
             gates:
-                in;
-                out;
+                conexion[2];
         };
         conm: Conmutador{
+            parameters:
+            probabilidad = prob;
             gates:
+                conexion[numcx];
                 in[sizeof(innodo)];
-                out[sizeof(outnodo)];
         };
     connections:
- 
-       for i=0..sizeof(innodo)-1 {
-           innodo[i] --> conm.in[i];
+        
+        for i=0..sizeof(innodo)-1 {
+            innodo[i] --> conm.in[i];
+           
        }
        
-       for j=0..sizeof(outnodo)-1 {
-           conm.out[j] --> protocolo[j].in;
-           protocolo[j].out <--> outnodo[j];
+       for j=0..sizeof(numcx)-1 {
+            conm.conexion[j] <--> protocolo[j].conexion[0];
+           protocolo[j].conexion[1] <--> outnodo[j];
        }
-        
+ 
 
 }
 
@@ -102,20 +107,40 @@ network StopAndWait
         nodo1: Nodo {
             parameters:
                 @display("i=,cyan;p=100.965004,61.215");
+                prob = 1/4;
             gates:
-                in;
-                out[1];
+                innodo[1];
+                outnodo[2];
         }
         nodo2: Nodo {
             parameters:
-                @display("i=,cyan;p=174.90001,78.705");
+                @display("i=,cyan;p=100.965004,61.215");
+                prob = 1/3;
             gates:
-                in;
-                out[2];
+                innodo[3];
+                outnodo[2];
         }
-        toc: Servidor {
+        
+        nodo5: Nodo {
+            parameters:
+                @display("i=,cyan;p=100.965004,61.215");
+                prob = 1/2;
+            gates:
+                innodo[2];
+                outnodo[2];
+        }
+        nodo3: Servidor {
             parameters:
                 @display("i=,gold;p=267.915,78.705");
+            gates:
+                cx[1];
+                    
+        }
+        nodo4: Servidor {
+            parameters:
+                @display("i=,gold;p=267.915,78.705");
+            gates:
+                cx[2];
         }
     connections:
         fuente.out --> nodo1.in[0];

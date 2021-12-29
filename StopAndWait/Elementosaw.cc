@@ -13,6 +13,8 @@ class Elementosaw : public cSimpleModule
         Paquete *timeoutEvent;  // holds pointer to the timeout self-message
         simtime_t timeout;  // timeout
 
+
+
     protected:
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;
@@ -42,13 +44,13 @@ void Elementosaw::handleMessage(cMessage *msg)
             sendNext();
         }
 
-    if (pkt -> getKind() == 4) { // 1: paquete de la fuente
+    if (pkt -> getKind() == 4) { // 4: paquete de la fuente
             pkt -> setKind(1); //porque ahora ya no es de una fuente, sino de un nodo
             EV << "Se envia un mensaje recibido de la fuente\n";
             sendNew(pkt);
             return;
         }
-    if (pkt -> getKind() == 1) { // 1: paquete de la fuente
+    if (pkt -> getKind() == 1) { // 1: paquete de otro nodo
 
         if (pkt -> hasBitError()) {
                     EV << "Hay error, se devuelve NACK\n";

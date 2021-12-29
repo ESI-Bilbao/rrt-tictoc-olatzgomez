@@ -38,11 +38,11 @@ void Conmutador::handleMessage(cMessage *msg)
     double aleatorio = dblrand();
 
     if(aleatorio < probabilidad)
-        salida = 0;
+        puertasalida = 0;
     else
-        salida = 1;
+        puertasalida = 1;
 
-    send(pkt, salida);
+    send(pkt, puertasalida);
 
 }
 
