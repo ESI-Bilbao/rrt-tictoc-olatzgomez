@@ -15,6 +15,7 @@ using namespace omnetpp;
 class Conmutador : public cSimpleModule
 {
     private:
+    double probabilidad;
 
     protected:
         virtual void initialize() override;
@@ -32,7 +33,16 @@ void Conmutador::initialize() {
 void Conmutador::handleMessage(cMessage *msg)
 {
     Paquete *pkt = check_and_cast<Paquete *> (msg);
-    send(pkt, "out");
+
+    int puertasalida;
+    double aleatorio = dblrand();
+
+    if(aleatorio < probabilidad)
+        salida = 0;
+    else
+        salida = 1;
+
+    send(pkt, salida);
 
 }
 

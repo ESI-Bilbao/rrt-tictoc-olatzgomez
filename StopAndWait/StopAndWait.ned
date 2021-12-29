@@ -32,8 +32,8 @@ simple Elementosaw
     parameters:
         @display("i=block/routing");
     gates:
-        input in[];
-        output out[];
+        input in;
+      	inout out;
 }
 
 simple Conmutador
@@ -42,33 +42,40 @@ simple Conmutador
         @display("i=block/routing");
     gates:
         input in[];
-        output out;
+        output out[];
 }
 
 module Nodo
 {
     gates:
-        input in[];
-        output out[];
+        input innodo[];
+        inout outnodo[];
 
     submodules:
-        protocolo: Elementosaw {
+        protocolo[sizeof(outnodo)]: Elementosaw {
             parameters:
             @display("p=106,122");
+            
             gates:
-                in[1];
-                out[2];
+                in;
+                out;
         };
         conm: Conmutador{
             gates:
-                in[2];
-                out;
+                in[sizeof(innodo)];
+                out[sizeof(outnodo)];
         };
     connections:
-        in --> conm.in;
-        conm.out --> protocolo.in[0];
-        protocolo.out[0] --> out[0];
-        protocolo.out[1] --> out[1];
+ 
+       for i=0..sizeof(innodo)-1 {
+           innodo[i] --> conm.in[i];
+       }
+       
+       for j=0..sizeof(outnodo)-1 {
+           conm.out[j] --> protocolo[j].in;
+           protocolo[j].out <--> outnodo[j];
+       }
+        
 
 }
 
