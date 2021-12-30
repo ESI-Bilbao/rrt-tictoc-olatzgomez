@@ -31,8 +31,8 @@ simple Elementosaw
     parameters:
         @display("i=block/routing");
     gates:
-        
-      	inout conexion[];
+
+        inout conexion[];
 }
 
 simple Conmutador
@@ -50,37 +50,43 @@ module Nodo
     parameters:
         double prob;
         int numcx;
+        @display("bgb=323,146");
     gates:
         input innodo[];
         inout outnodo[];
-		
+
     submodules:
         protocolo[numcx]: Elementosaw {
             parameters:
-            @display("p=106,122");
-            
+                @display("p=255,70");
+
             gates:
                 conexion[2];
-        };
-        conm: Conmutador{
+        }
+        conm: Conmutador {
             parameters:
-            probabilidad = prob;
+                probabilidad = prob;
+                @display("p=66,70");
             gates:
                 conexion[numcx];
                 in[sizeof(innodo)];
-        };
+        }
     connections:
         
+        for i=0..(numcx-1) {
+            conm.conexion[i] <--> protocolo[i].conexion[0];
+  			outnodo[i] <--> protocolo[i].conexion[1];
+        }
+        
+
         for i=0..sizeof(innodo)-1 {
             innodo[i] --> conm.in[i];
-           
-       }
-       
-       for j=0..sizeof(numcx)-1 {
-            conm.conexion[j] <--> protocolo[j].conexion[0];
-           protocolo[j].conexion[1] <--> outnodo[j];
-       }
- 
+
+        }
+        
+	//	protocolo[0].conexion[1] <--> outnodo[0];
+        
+
 
 }
 
@@ -89,7 +95,7 @@ module Nodo
 //
 network StopAndWait
 {
-    @display("bgb=304,155");
+    @display("bgb=381.6,208.29001");
     types:
         channel Channel extends ned.DatarateChannel
         {
@@ -99,55 +105,75 @@ network StopAndWait
         }
 
     submodules:
-        fuente: Usuario {
+        fuente1: Usuario {
             parameters:
                 longitudmedia = 9600/3;
                 @display("p=25.44,30.210001");
         }
+        fuente2: Usuario {
+            parameters:
+                longitudmedia = 9600/3;
+                @display("p=112.89,24.645");
+        }
+        fuente5: Usuario {
+            parameters:
+                longitudmedia = 9600/3;
+                @display("p=100.965004,173.31");
+        }
         nodo1: Nodo {
             parameters:
-                @display("i=,cyan;p=100.965004,61.215");
+                @display("i=,cyan;p=100.965004,93.015");
                 prob = 1/4;
+                numcx = 2;
             gates:
                 innodo[1];
                 outnodo[2];
         }
         nodo2: Nodo {
             parameters:
-                @display("i=,cyan;p=100.965004,61.215");
+                @display("i=,cyan;p=186.825,49.29");
                 prob = 1/3;
+                numcx = 4;
             gates:
-                innodo[3];
-                outnodo[2];
+                innodo[1];
+                outnodo[4];
         }
-        
+
         nodo5: Nodo {
             parameters:
-                @display("i=,cyan;p=100.965004,61.215");
+                @display("i=,cyan;p=186.03,142.30501");
                 prob = 1/2;
+                numcx = 3;
             gates:
-                innodo[2];
-                outnodo[2];
+                innodo[1];
+                outnodo[3];
         }
         nodo3: Servidor {
             parameters:
-                @display("i=,gold;p=267.915,78.705");
+                @display("i=,gold;p=333.105,47.7");
             gates:
                 cx[1];
-                    
+
         }
         nodo4: Servidor {
             parameters:
-                @display("i=,gold;p=267.915,78.705");
+                @display("i=,gold;p=338.67,142.30501");
             gates:
                 cx[2];
         }
     connections:
-        fuente.out --> nodo1.in[0];
-        nodo1.out[0] --> Channel --> nodo2.in[0];
-        nodo2.out[1] --> Channel --> nodo1.in[1];
-        nodo2.out[0] --> Channel --> toc.in;
-        nodo2.in[1] <-- Channel <-- toc.out;
+        fuente1.out --> nodo1.innodo[0];
+        nodo1.outnodo[0] <--> Channel <--> nodo2.outnodo[3];
+        nodo1.outnodo[1] <--> Channel <--> nodo5.outnodo[2];
+
+        fuente2.out --> nodo2.innodo[0];
+        nodo2.outnodo[0] <--> Channel <--> nodo3.cx[0];
+        nodo2.outnodo[1] <--> Channel <--> nodo4.cx[0];
+
+        fuente5.out --> nodo5.innodo[0];
+        nodo5.outnodo[0] <--> Channel <--> nodo2.outnodo[2];
+        nodo5.outnodo[1] <--> Channel <--> nodo4.cx[1];
+
 
 }
 

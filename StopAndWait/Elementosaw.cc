@@ -50,19 +50,27 @@ void Elementosaw::handleMessage(cMessage *msg)
             sendNew(pkt);
             return;
         }
+
+    if (pkt -> getKind() == 5) { // 4: paquete del conmutador
+                pkt -> setKind(1); //porque ahora ya no es desde el conmutador, sino de un nodo
+                EV << "Se envia un mensaje recibido del conmutador\n";
+                sendNew(pkt);
+                return;
+            }
+
     if (pkt -> getKind() == 1) { // 1: paquete de otro nodo
 
         if (pkt -> hasBitError()) {
                     EV << "Hay error, se devuelve NACK\n";
                     Paquete *nak = new Paquete("NAK");
                     nak -> setKind(3);
-                    send(nak, "out",1);
+                    send(nak, "conexion$o",1);
                 }
                 else {
                     EV << "No hay error, se devuelve un ACK\n";
                     Paquete *ack = new Paquete("ACK");
                     ack -> setKind(2);
-                    send(ack, "out",1);
+                    send(ack, "conexion$o",1);
                     EV << "Packet it's okay!";
                 }
         EV << "Se envia un mensaje recibido de otro nodo\n";
@@ -115,7 +123,14 @@ void Elementosaw::sendPacket(Paquete *pkt) {
 
         // OMNeT++ can't send a packet while it is queued, must send a copy
         Paquete *newPkt = check_and_cast<Paquete *> (pkt -> dup());
-        send(newPkt, "out",0);
+
+
+        if (pkt -> getKind() == 5) {
+               send(newPkt, "conexion$o",1);
+        } else {
+            send(newPkt, "conexion$o",0);
+        }
+
         scheduleAt(simTime()+timeout, timeoutEvent);
 
 }

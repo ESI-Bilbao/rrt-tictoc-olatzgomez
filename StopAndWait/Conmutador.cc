@@ -33,6 +33,7 @@ void Conmutador::initialize() {
 void Conmutador::handleMessage(cMessage *msg)
 {
     Paquete *pkt = check_and_cast<Paquete *> (msg);
+    pkt -> setKind(5); //indicamos que el paquete ha pasado por el conmutador
 
     int puertasalida;
     double aleatorio = dblrand();
@@ -42,7 +43,7 @@ void Conmutador::handleMessage(cMessage *msg)
     else
         puertasalida = 1;
 
-    send(pkt, puertasalida);
+    send(pkt, "conexion$o", puertasalida);
 
 }
 
