@@ -16,7 +16,7 @@ class Conmutador : public cSimpleModule
 {
     private:
     double probabilidad;
-
+    int numeronodo;
     protected:
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;
@@ -26,7 +26,8 @@ class Conmutador : public cSimpleModule
 Define_Module(Conmutador);
 
 void Conmutador::initialize() {
-
+    probabilidad = (double) par("probabilidad");
+    numeronodo = (int) par("numeronodo");
 
 }
 
@@ -34,7 +35,7 @@ void Conmutador::handleMessage(cMessage *msg)
 {
     Paquete *pkt = check_and_cast<Paquete *> (msg);
     pkt -> setKind(5); //indicamos que el paquete ha pasado por el conmutador
-
+    pkt -> setUltimonodo(numeronodo);
     int puertasalida;
     double aleatorio = dblrand();
 

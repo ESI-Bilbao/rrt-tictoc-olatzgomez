@@ -37,6 +37,11 @@ void Elementosaw::handleMessage(cMessage *msg)
 {
     Paquete *pkt = check_and_cast<Paquete *> (msg);
 
+    int nodo = pkt -> getUltimonodo();
+
+        EV << "Ha llegado un paquete del nodo "+std::to_string(nodo)+"\n";
+
+
     if (msg == timeoutEvent) {
             // If we receive the timeout event, that means the packet hasn't
             // arrived in time and we have to re-send it.
@@ -71,7 +76,7 @@ void Elementosaw::handleMessage(cMessage *msg)
                     Paquete *ack = new Paquete("ACK");
                     ack -> setKind(2);
                     send(ack, "conexion$o",1);
-                    EV << "Packet it's okay!";
+
                 }
         EV << "Se envia un mensaje recibido de otro nodo\n";
         sendNew(pkt);
@@ -79,7 +84,7 @@ void Elementosaw::handleMessage(cMessage *msg)
     }
 
     if (pkt -> getKind() == 2) { // 2: ACK
-        EV << "ACK from next node\n";
+        EV << "Se ha recibido un ACK\n";
         cancelEvent(timeoutEvent); // se cancela el timeoutevent porque ha llegado el ACK
         if (queue -> isEmpty())
             EV << "Se ha recibido ACK pero no hay mas paquetes en la cola\n";
@@ -90,7 +95,7 @@ void Elementosaw::handleMessage(cMessage *msg)
         }
     }
     if (pkt -> getKind() == 3) { // 3: NACK
-        EV << "NAK from next node\n";
+        EV << "Se ha recibido un NAK\n";
         cancelEvent(timeoutEvent); // se cancela el timeout del intento anterior de envio
         sendNext();
     }
@@ -99,12 +104,12 @@ void Elementosaw::handleMessage(cMessage *msg)
 void Elementosaw::sendNew(Paquete *pkt) {
 
     if (queue -> isEmpty()) {
-        EV << "La cola esta vacia\n";
+        //EV << "La cola esta vacia\n";
         // Insert in queue (it may have to be sent again)
         queue -> insert(pkt);
         sendPacket(pkt);
     } else {
-        EV << "La cola no esta vacia\n";
+        //EV << "La cola no esta vacia\n";
         queue -> insert(pkt);
     }
 }

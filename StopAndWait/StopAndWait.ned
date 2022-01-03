@@ -40,6 +40,7 @@ simple Conmutador
     parameters:
         @display("i=block/routing");
         double probabilidad;
+        int numeronodo;
     gates:
         inout conexion[];
         input in[];
@@ -50,6 +51,7 @@ module Nodo
     parameters:
         double prob;
         int numcx;
+        int numnodo;
         @display("bgb=323,146");
     gates:
         input innodo[];
@@ -66,6 +68,7 @@ module Nodo
         conm: Conmutador {
             parameters:
                 probabilidad = prob;
+                numeronodo = numnodo;
                 @display("p=66,70");
             gates:
                 conexion[numcx];
@@ -125,6 +128,7 @@ network StopAndWait
                 @display("i=,cyan;p=100.965004,93.015");
                 prob = 1/4;
                 numcx = 2;
+                numnodo = 1;
             gates:
                 innodo[1];
                 outnodo[2];
@@ -134,6 +138,7 @@ network StopAndWait
                 @display("i=,cyan;p=186.825,49.29");
                 prob = 1/3;
                 numcx = 4;
+                numnodo = 2;
             gates:
                 innodo[1];
                 outnodo[4];
@@ -144,6 +149,7 @@ network StopAndWait
                 @display("i=,cyan;p=186.03,142.30501");
                 prob = 1/2;
                 numcx = 3;
+                numnodo = 5;
             gates:
                 innodo[1];
                 outnodo[3];

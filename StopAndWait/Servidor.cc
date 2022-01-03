@@ -17,6 +17,9 @@ Define_Module(Servidor);
 void Servidor::handleMessage(cMessage *msg)
 {
     Paquete *pkt = (Paquete*) msg;
+    int nodo = pkt -> getUltimonodo();
+
+    EV << "Ha llegado un paquete del nodo "+std::to_string(nodo)+"\n";
 
     if (pkt -> getKind() == 1) { // 1: Packet
         if (pkt -> hasBitError()) {
