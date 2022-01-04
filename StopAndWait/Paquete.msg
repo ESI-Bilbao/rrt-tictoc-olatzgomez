@@ -17,4 +17,6 @@ packet Paquete {
 	int numeroseq;
 	int numerrors;
 	int ultimonodo;
+	double momentosalida;
+	double momentosalidaun;
 }

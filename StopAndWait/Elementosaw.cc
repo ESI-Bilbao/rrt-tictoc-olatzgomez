@@ -132,6 +132,7 @@ void Elementosaw::sendPacket(Paquete *pkt) {
 // estaba aqui el error. antes de entrar a esta funcion se hacia un setKind a 1 por lo que solo entraba al else
         if (newPkt -> getKind() == 5) {
             newPkt -> setKind(1);
+            newPkt -> setMomentosalidaun(simTime().dbl()*1000);
             send(newPkt, "conexion$o",1);
         } else {
             newPkt -> setKind(1);

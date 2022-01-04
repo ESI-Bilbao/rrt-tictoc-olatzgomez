@@ -40,6 +40,7 @@ void Usuario::initialize() {
 
         Paquete *pqt = getPacket();
         pqt -> setBitLength(longitudes[i]);
+        pqt -> setMomentosalida(llegadas[i]*1000);
         scheduleAt(llegadas[i], pqt);
     }
 
