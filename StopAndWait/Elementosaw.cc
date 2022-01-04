@@ -39,7 +39,7 @@ void Elementosaw::handleMessage(cMessage *msg)
 
     int nodo = pkt -> getUltimonodo();
 
-        EV << "Ha llegado un paquete del nodo "+std::to_string(nodo)+"\n";
+        //EV << "Ha llegado un paquete del nodo "+std::to_string(nodo)+"\n";
 
 
     if (msg == timeoutEvent) {
@@ -50,21 +50,21 @@ void Elementosaw::handleMessage(cMessage *msg)
         }
 
     if (pkt -> getKind() == 4) { // 4: paquete de la fuente
-            pkt -> setKind(1); //porque ahora ya no es de una fuente, sino de un nodo
+            // aqui estaba el error pkt -> setKind(1); //porque ahora ya no es de una fuente, sino de un nodo
             EV << "Se envia un mensaje recibido de la fuente\n";
             sendNew(pkt);
             return;
         }
 
     if (pkt -> getKind() == 5) { // 4: paquete del conmutador
-                pkt -> setKind(1); //porque ahora ya no es desde el conmutador, sino de un nodo
+                // aqui estaba el error pkt -> setKind(1); //porque ahora ya no es desde el conmutador, sino de un nodo
                 EV << "Se envia un mensaje recibido del conmutador\n";
                 sendNew(pkt);
                 return;
             }
 
     if (pkt -> getKind() == 1) { // 1: paquete de otro nodo
-
+        EV << "SE HA RECIBIDO UN PAQUETE DE OTRO NODO\n";
         if (pkt -> hasBitError()) {
                     EV << "Hay error, se devuelve NACK\n";
                     Paquete *nak = new Paquete("NAK");
@@ -129,10 +129,12 @@ void Elementosaw::sendPacket(Paquete *pkt) {
         // OMNeT++ can't send a packet while it is queued, must send a copy
         Paquete *newPkt = check_and_cast<Paquete *> (pkt -> dup());
 
-
-        if (pkt -> getKind() == 5) {
-               send(newPkt, "conexion$o",1);
+// estaba aqui el error. antes de entrar a esta funcion se hacia un setKind a 1 por lo que solo entraba al else
+        if (newPkt -> getKind() == 5) {
+            newPkt -> setKind(1);
+            send(newPkt, "conexion$o",1);
         } else {
+            newPkt -> setKind(1);
             send(newPkt, "conexion$o",0);
         }
 

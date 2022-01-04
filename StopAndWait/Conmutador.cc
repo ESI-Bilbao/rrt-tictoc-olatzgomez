@@ -39,11 +39,14 @@ void Conmutador::handleMessage(cMessage *msg)
     int puertasalida;
     double aleatorio = dblrand();
 
-    if(aleatorio < probabilidad)
+    if(aleatorio < probabilidad){
         puertasalida = 0;
-    else
+        EV << "Puerta de salida 0\n";
+    }
+    else{
         puertasalida = 1;
-
+        EV << "Puerta de salida 1\n";
+    }
     send(pkt, "conexion$o", puertasalida);
 
 }
