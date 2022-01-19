@@ -11,6 +11,7 @@ class Servidor : public cSimpleModule
     private:
         double retardoee;
         double retardoenlace;
+        int paqrec; // paquetes recibidos
         cLongHistogram retardoeehist;
         cOutVector retardoeevec;
         cLongHistogram retardoenlacehist;
@@ -28,8 +29,11 @@ void Servidor::initialize()
         // Initialize variables
         retardoee = 0;
         retardoenlace = 0;
+        paqrec = 0;
+
         WATCH(retardoee);
         WATCH(retardoenlace);
+        WATCH(paqrec);
 
         retardoenlacehist.setName("retardoenlacehist");
         retardoeehist.setName("retardoeehist");
@@ -59,15 +63,19 @@ void Servidor::handleMessage(cMessage *msg)
         else {
             EV << "No hay error, se devuelve un ACK\n";
 
+            paqrec++;
+
             double tiempouno = pkt -> getMomentosalida();
             double tiempodos = pkt -> getMomentosalidaun();
-            retardoee = simTime().dbl()*1000+tiempouno;
-            retardoenlace = simTime().dbl()*1000+tiempodos;
+            retardoee = simTime().dbl()*1000-tiempouno;
+            retardoenlace = simTime().dbl()*1000-tiempodos;
             retardoeehist.collect(retardoee);
             retardoeevec.record(retardoee);
 
             retardoenlacehist.collect(retardoenlace);
             retardoenlacevec.record(retardoenlace);
+            EV << "Retardo enlace: "<<retardoenlace<<" ms\n";
+            EV << "Retardo end to end: "<<retardoee<<" ms\n";
 
             Paquete *ack = new Paquete("ACK");
 
@@ -88,13 +96,13 @@ void Servidor::finish()
     //    EV << "Hop count, mean:   " << hopCountStats.getMean() << endl;
     //   EV << "Hop count, stddev: " << hopCountStats.getStddev() << endl;
 
-        EV << "Ultimo retardo enlace:     " << retardoenlace << endl;
+        //EV << "Ultimo retardo enlace:     " << retardoenlace << endl;
 
-        EV << "Media retardo end to end   " << retardoeehist.getMean() << endl;
+        //EV << "Media retardo end to end   " << retardoeehist.getMean() << endl;
 
         recordScalar("#retardoendtoend", retardoee);
         recordScalar("#retardoenlace", retardoenlace);
 
-        retardoenlacehist.recordAs("retardoenlace");
-        retardoeehist.recordAs("retardoee");
+        retardoenlacehist.recordAs("retardo enlace");
+        retardoeehist.recordAs("retardo e2e");
     }

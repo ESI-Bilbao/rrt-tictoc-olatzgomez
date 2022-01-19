@@ -12,7 +12,7 @@ class Elementosaw : public cSimpleModule
         cQueue *queue;  // cola
         Paquete *timeoutEvent;  // holds pointer to the timeout self-message
         simtime_t timeout;  // timeout
-
+        cChannel *canal;
 
 
     protected:
@@ -30,6 +30,10 @@ void Elementosaw::initialize() {
     queue = new cQueue("cola");
     timeout = 1.0;
     timeoutEvent = new Paquete("timeoutEvent");
+
+    //para evitar el error de channel busy
+
+    canal = gate("conexion$o",1)-> getTransmissionChannel();
 
 }
 
@@ -133,10 +137,21 @@ void Elementosaw::sendPacket(Paquete *pkt) {
         if (newPkt -> getKind() == 5) {
             newPkt -> setKind(1);
             newPkt -> setMomentosalidaun(simTime().dbl()*1000);
-            send(newPkt, "conexion$o",1);
+
+            if(canal->isBusy()){
+                double delay = canal->getTransmissionFinishTime().dbl()-simTime().dbl();
+                sendDelayed(newPkt,delay,"conexion$o",1);
+
+            }else{
+                send(newPkt, "conexion$o",1);
+            }
+
+            // ahora, asi solo se manda cuando este libre
+
+            // antes: send(newPkt, "conexion$o",1);
         } else {
             newPkt -> setKind(1);
-            send(newPkt, "conexion$o",0);
+            send(newPkt, "conexion$o",0); //hacia el conmu
         }
 
         scheduleAt(simTime()+timeout, timeoutEvent);
